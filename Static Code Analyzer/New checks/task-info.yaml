@@ -322,6 +322,12 @@ files:
     if __name__ == '__main__':
         AnalyzerTest("analyzer.code_analyzer").run_tests()
   learner_created: false
+- name: analyzer/my_test.py
+  visible: true
+  learner_created: true
 feedback_link: https://hyperskill.org/projects/112/stages/610/implement#comment
-status: Unchecked
+status: Solved
+feedback:
+  message: Congratulations!
+  time: "Wed, 01 Feb 2023 16:26:46 UTC"
 record: -1
