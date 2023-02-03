@@ -1,3 +1,7 @@
+import os
+import sys
+
+
 class PEP8:
     MAX_LINE_LEN = 79
 
@@ -74,6 +78,13 @@ class PEP8:
                     self.line_issues[i] = ['S006']
                 empty_lines = 0
 
+    def check_result(self):
+        result = []
+        for line_num, issues in self.line_issues.items():
+            for issue in issues:
+                result.append({'line': line_num + 1, 'code': issue, 'msg': self.CHECKS[issue]["msg"]})
+        return result
+
     def __str__(self):
         result = ''
         for line_num, issues in self.line_issues.items():
@@ -95,14 +106,26 @@ class StaticCodeAnalyzer:
     def run(self):
         pep8 = PEP8(self.read_file())
         pep8.check_lines()
-        if len(str(pep8)) > 0:
-            print(pep8)
+        result = pep8.check_result()
+        if len(result) > 0:
+            for r in result:
+                print(f'{self.file_path}: Line {r["line"]}: {r["code"]} {r["msg"]}')
 
 
 if __name__ == '__main__':
-    file_name = input()
-    # file_name = 'my_test.py'
+    path = sys.argv[1]
+    # print(path)
+    if os.path.isdir(path):
+        files_name = [path + '/' + fl for fl in os.listdir(path) if fl.endswith('.py')]
+    else:
+        files_name = [path]
+    # print(files_name)
+    files_name.sort()
+    for fl in files_name:
+        # print(fl)
+        if fl.endswith('tests.py'):
+            continue
+        sca = StaticCodeAnalyzer(fl)
+        sca.run()
 
-    sca = StaticCodeAnalyzer(file_name)
-    sca.run()
 

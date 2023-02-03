@@ -454,6 +454,23 @@ files:
     if __name__ == '__main__':
         AnalyzerTest("analyzer.code_analyzer").run_tests()
   learner_created: false
+- name: analyzer/my_test.py
+  visible: true
+  text: |-
+    print('What\'s your name?') # reading an input
+    name = input();
+    print(f'Hello, {name}');  # here is an obvious comment: this prints a greeting with a name
+
+
+    very_big_number = 11_000_000_000_000_000_000_000_000_000_000_000_000_000_000_000
+    print(very_big_number)
+
+
+
+    def some_fun():
+        print('NO TODO HERE;;')
+        pass; # Todo something
+  learner_created: true
 feedback_link: https://hyperskill.org/projects/112/stages/612/implement#comment
 status: Unchecked
 record: -1
