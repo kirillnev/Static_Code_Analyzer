@@ -1,10 +1,10 @@
 import os
+import re
 import sys
 
 
 class PEP8:
     MAX_LINE_LEN = 79
-
 
     def __init__(self, lines):
         self.line_issues = {}
@@ -31,52 +31,75 @@ class PEP8:
                 'msg': 'TODO found'
             },
             'S006': {
-                'func': None,
+                'func': self.check_s006,
                 'msg': 'More than two blank lines preceding a code line'
-            }
+            },
+            'S007': {
+                'func': self.check_s007,
+                'msg': 'Too many spaces after construction_name'
+            },
+            'S008': {
+                'func': self.check_s008,
+                'msg': 'Class name class_name should be written in CamelCase'
+            },
+            'S009': {
+                'func': self.check_s009,
+                'msg': 'Function name function_name should be written in snake_case'
+            },
         }
 
-    def check_s001(self, line):
+    def check_s001(self, line_num):
+        line = self.lines[line_num]
         return len(line) <= self.MAX_LINE_LEN
 
-    def check_s002(self, line):
+    def check_s002(self, line_num):
+        line = self.lines[line_num]
         return len(line.lstrip()) == 0 or (len(line) - len(line.lstrip())) % 4 == 0
 
-    def check_s003(self, line):
+    def check_s003(self, line_num):
+        line = self.lines[line_num]
         return line.split('#')[0].rstrip()[::-1].find(';') != 0
 
-    def check_s004(self, line):
+    def check_s004(self, line_num):
+        line = self.lines[line_num]
         return line.strip().find('#') <= 0 or line.strip().find('  #') > 0
 
-    def check_s005(self, line):
+    def check_s005(self, line_num):
+        line = self.lines[line_num]
         return len(line.split('#')) == 1 or line.split('#')[-1].lower().find('todo') == -1
 
-    def check_s006(self, line):
-        return True
+    def check_s006(self, line_num):
+        # line = self.lines[line_num]
+        return (line_num < 3
+                or not (len(self.lines[line_num - 1].strip()) == 0
+                        and len(self.lines[line_num - 2].strip()) == 0
+                        and len(self.lines[line_num - 3].strip()) == 0))
 
-    def check_line(self, line):
+    def check_s007(self, line_num):
+        line = self.lines[line_num]
+        regex_tmpl = r' *(?:class|def) {2,}'
+        return re.match(regex_tmpl, line) is None
+
+    def check_s008(self, line_num):
+        line = self.lines[line_num]
+        regex_tmpl = r'class +[a-z]'
+        return re.match(regex_tmpl, line) is None
+
+    def check_s009(self, line_num):
+        line = self.lines[line_num]
+        regex_tmpl = r'def +_*[A-Z]'
+        return re.match(regex_tmpl, line) is None
+
+    def check_line(self, line_num):
         issues = []
-        for key, value in self.CHECKS.items():
-            if value['func'] is not None:
-                if not value['func'](line):
+        if len(self.lines[line_num].strip()) > 0:
+            for key, value in self.CHECKS.items():
+                if not value['func'](line_num):
                     issues.append(key)
         return issues
 
     def check_lines(self):
-        empty_lines = 0
-        for i, line in enumerate(self.lines):
-            if len(line.strip()) == 0:
-                empty_lines += 1
-            elif len(self.check_line(line)) > 0:
-                self.line_issues[i] = self.check_line(line)
-                empty_lines = 0
-
-            if empty_lines > 2 and len(line.strip()) > 0:
-                if self.line_issues.get(i) is not None:
-                    self.line_issues[i] += ['S006']
-                else:
-                    self.line_issues[i] = ['S006']
-                empty_lines = 0
+        self.line_issues = {i: self.check_line(i) for i in range(len(self.lines))}
 
     def check_result(self):
         result = []

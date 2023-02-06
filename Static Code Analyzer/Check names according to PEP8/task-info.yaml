@@ -471,6 +471,12 @@ files:
         print('NO TODO HERE;;')
         pass; # Todo something
   learner_created: true
+- name: test/test_0.py
+  visible: true
+  learner_created: true
 feedback_link: https://hyperskill.org/projects/112/stages/612/implement#comment
-status: Unchecked
-record: -1
+status: Solved
+feedback:
+  message: Congratulations!
+  time: "Mon, 06 Feb 2023 06:59:24 UTC"
+record: 4
